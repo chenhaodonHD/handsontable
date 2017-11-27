@@ -2336,6 +2336,44 @@ describe('AutocompleteEditor', () => {
     }, 400);
   });
 
+  // Input element can not lose the focus while entering new characters. It breaks IME editor functionality for Asian users.
+  it('should not lose the focus on input element while inserting new characters (#839)', async () => {
+    let blured = false;
+    const listener = () => {
+      blured = true;
+    };
+    const hot = handsontable({
+      data: [
+        ['one', 'two'],
+        ['three', 'four']
+      ],
+      columns: [
+        {
+          type: 'autocomplete',
+          source: choices,
+        },
+        {},
+      ],
+    });
+
+    selectCell(0, 0);
+    keyDownUp('enter');
+    hot.getActiveEditor().TEXTAREA.addEventListener('blur', listener);
+
+    await sleep(200);
+
+    hot.getActiveEditor().TEXTAREA.value = 't';
+    keyDownUp('t'.charCodeAt(0));
+    hot.getActiveEditor().TEXTAREA.value = 'te';
+    keyDownUp('e'.charCodeAt(0));
+    hot.getActiveEditor().TEXTAREA.value = 'teo';
+    keyDownUp('o'.charCodeAt(0));
+
+    expect(blured).toBeFalsy();
+
+    hot.getActiveEditor().TEXTAREA.removeEventListener('blur', listener);
+  });
+
   it('should not call the `source` has been selected', () => {
     var syncSources = jasmine.createSpy('syncSources');
 

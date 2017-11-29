@@ -212,6 +212,8 @@ AutocompleteEditor.prototype.updateChoicesList = function(choices) {
     this.highlightBestMatchingChoice(highlightIndex);
   }
 
+  this.instance.listen(false);
+
   setCaretPosition(this.TEXTAREA, pos, (pos === endPos ? void 0 : endPos));
 };
 

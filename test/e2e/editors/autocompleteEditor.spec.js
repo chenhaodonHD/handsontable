@@ -2374,6 +2374,42 @@ describe('AutocompleteEditor', () => {
     hot.getActiveEditor().TEXTAREA.removeEventListener('blur', listener);
   });
 
+  it('should not lose the focus from the editor after selecting items from the choice list', async () => {
+    const hot = handsontable({
+      data: [
+        ['', 'two'],
+        ['three', 'four']
+      ],
+      columns: [
+        {
+          type: 'autocomplete',
+          source: ['brown', 'yellow', 'green'],
+        },
+        {},
+      ],
+    });
+
+    selectCell(0, 0);
+    keyDownUp('enter');
+
+    await sleep(0);
+
+    keyDownUp('arrow_down');
+    keyDownUp('arrow_down');
+    keyDownUp('arrow_down');
+
+    hot.getActiveEditor().TEXTAREA.value = 'r';
+    keyDownUp('R'.charCodeAt(0));
+
+    await sleep(0);
+
+    // Check if ESCAPE key is responsive.
+    keyDownUp('esc');
+
+    expect(hot.isListening()).toBeTruthy();
+    expect(Handsontable.dom.isVisible(hot.getActiveEditor().htEditor.rootElement)).toBeFalsy();
+  });
+
   it('should not call the `source` has been selected', () => {
     var syncSources = jasmine.createSpy('syncSources');
 
